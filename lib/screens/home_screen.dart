@@ -19,7 +19,7 @@ AppBar homeAppBar() {
     title: Center(
       child: Image.asset(
         color: TractianColors.white,
-        'assets/tractian_logo.png',
+        'assets/images/tractian_logo.png',
         height: 40,
       ),
     ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/widgets/elevated_button.dart';
 
 class UnitButton extends StatelessWidget {
-  static const String iconPath = 'assets/icon_factory.png';
+  static const String iconPath = 'assets/images/icon_factory.png';
   final String unitName;
 
   const UnitButton({super.key, required this.unitName});
