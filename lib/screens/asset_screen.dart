@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/colors.dart';
-import 'package:tractian_tree_view/elevated_button.dart';
+import 'package:tractian_tree_view/theme/colors.dart';
+import 'package:tractian_tree_view/widgets/elevated_button.dart';
 
 class AssetsPage extends StatelessWidget {
   const AssetsPage({super.key});
@@ -47,11 +47,11 @@ class AssetsPage extends StatelessWidget {
                 const Row(children: [
                   SizedBox(width: 8),
                   ElevatedButtonWithIcon(
-                      iconPath: 'assets/bolt_outlined.png',
+                      iconPath: 'assets/images/bolt_outlined.png',
                       text: 'Sensor de Energia'),
                   SizedBox(width: 8),
                   ElevatedButtonWithIcon(
-                      iconPath: 'assets/critical_outlined.png',
+                      iconPath: 'assets/images/critical_outlined.png',
                       text: 'Crítico'),
                 ])
               ],

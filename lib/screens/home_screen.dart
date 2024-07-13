@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/colors.dart';
-import 'package:tractian_tree_view/unit_button.dart';
+import 'package:tractian_tree_view/theme/colors.dart';
+import 'package:tractian_tree_view/widgets/unit_button.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
