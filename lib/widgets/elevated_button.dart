@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
 
 // TODO: use StateFulWidget
@@ -11,13 +10,17 @@ class ElevatedButtonWithIcon extends StatelessWidget {
   final double? width;
   final double? height;
 
-  const ElevatedButtonWithIcon(
-      {super.key,
-      required this.iconPath,
-      required this.text,
-      this.width,
-      this.height,
-      this.colored = false});
+  final VoidCallback onPressed;
+
+  const ElevatedButtonWithIcon({
+    super.key,
+    required this.iconPath,
+    required this.text,
+    required this.onPressed,
+    this.width,
+    this.height,
+    this.colored = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class ElevatedButtonWithIcon extends StatelessWidget {
       width: width,
       height: height,
       child: ElevatedButton(
-        onPressed: () => _onUnitPressed(context),
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: getBackgroundColor(),
           shape: RoundedRectangleBorder(
@@ -52,10 +55,6 @@ class ElevatedButtonWithIcon extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _onUnitPressed(BuildContext context) {
-    Fluttertoast.showToast(msg: 'Pressed $text');
   }
 
   Color getBackgroundColor() {

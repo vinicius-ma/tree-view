@@ -15,6 +15,13 @@ class UnitButton extends StatelessWidget {
       iconPath: iconPath,
       text: unitName,
       colored: true,
+      onPressed: () {
+        navigateToAssets(context);
+      },
     );
+  }
+
+  void navigateToAssets(BuildContext context) {
+    Navigator.pushNamed(context, '/assets');
   }
 }

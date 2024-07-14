@@ -13,7 +13,7 @@ class AssetsPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Handle back button press
+            Navigator.pop(context);
           },
         ),
         title: const Text('Assets'),
@@ -33,9 +33,11 @@ class AssetsPage extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: 'Buscar Ativo ou Local',
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0)
+                              borderRadius: BorderRadius.circular(10.0)),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: TractianColors.darkGray,
                           ),
-                          prefixIcon: const Icon(Icons.search, color: TractianColors.darkGray,),
                           filled: true,
                           fillColor: TractianColors.lightGray,
                         ),
@@ -44,15 +46,19 @@ class AssetsPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Row(children: [
-                  SizedBox(width: 8),
+                Row(children: [
+                  const SizedBox(width: 8),
                   ElevatedButtonWithIcon(
-                      iconPath: 'assets/images/bolt_outlined.png',
-                      text: 'Sensor de Energia'),
-                  SizedBox(width: 8),
+                    iconPath: 'assets/images/bolt_outlined.png',
+                    text: 'Sensor de Energia',
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 8),
                   ElevatedButtonWithIcon(
-                      iconPath: 'assets/images/critical_outlined.png',
-                      text: 'Crítico'),
+                    iconPath: 'assets/images/critical_outlined.png',
+                    text: 'Crítico',
+                    onPressed: () {},
+                  ),
                 ])
               ],
             ),
@@ -133,7 +139,8 @@ class AssetItem extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
 
-  const AssetItem({super.key, 
+  const AssetItem({
+    super.key,
     required this.title,
     this.children,
     this.icon,

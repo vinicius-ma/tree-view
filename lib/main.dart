@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/screens/asset_screen.dart';
+import 'package:tractian_tree_view/screens/home_screen.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
 
 void main() {
@@ -18,7 +19,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: TractianColors.lightBlue),
         primarySwatch: Colors.blue,
       ),
-      home: const AssetsPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomePage(),
+        '/assets': (context) => const AssetsPage(),
+      },
     );
   }
 }
