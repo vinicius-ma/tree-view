@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
 
-// TODO: use StateFulWidget
 class ElevatedButtonWithIcon extends StatelessWidget {
   final String iconPath;
   final String text;
