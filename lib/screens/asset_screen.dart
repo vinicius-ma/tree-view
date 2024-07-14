@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
-import 'package:tractian_tree_view/widgets/elevated_button.dart';
+import 'package:tractian_tree_view/widgets/filter_button.dart';
 
-class AssetsPage extends StatelessWidget {
+class AssetsPage extends StatefulWidget {
   const AssetsPage({super.key});
+
+  @override
+  State<AssetsPage> createState() => _AssetsPageState();
+}
+
+class _AssetsPageState extends State<AssetsPage> {
+  bool filterEnergy = false;
+  bool filterCritical = false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +56,23 @@ class AssetsPage extends StatelessWidget {
                 ),
                 Row(children: [
                   const SizedBox(width: 8),
-                  ElevatedButtonWithIcon(
-                    iconPath: 'assets/images/bolt_outlined.png',
-                    text: 'Sensor de Energia',
-                    onPressed: () {},
-                  ),
+                  FilterButton(
+                      assetName: 'bolt_outlined',
+                      text: 'Sensor de Energia',
+                      onPressed: (pressed) {
+                        setState(() {
+                          filterEnergy = pressed;
+                        });
+                      }),
                   const SizedBox(width: 8),
-                  ElevatedButtonWithIcon(
-                    iconPath: 'assets/images/critical_outlined.png',
+                  FilterButton(
+                    assetName: 'critical_outlined',
                     text: 'Crítico',
-                    onPressed: () {},
+                    onPressed: (pressed) {
+                      setState(() {
+                        filterCritical = pressed;
+                      });
+                    },
                   ),
                 ])
               ],
