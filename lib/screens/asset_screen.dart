@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
 import 'package:tractian_tree_view/widgets/filter_button.dart';
 
+// TODO: Use the Assets class from tests
 class AssetsPage extends StatefulWidget {
   const AssetsPage({super.key});
 
