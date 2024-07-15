@@ -1,24 +1,21 @@
+
 import 'package:tractian_tree_view/models/asset.dart';
 import 'package:tractian_tree_view/tests/companies.dart';
 
 class Assets {
-  static var values = <String, List<Asset>>{};
+
+  static final _values = _initValues();
 
   static Map<String, List<Asset>> get() {
-    if (values.isEmpty) {
-      initValues();
-    }
-    return values;
-  }
-  
-  static List<Asset> getByCompany(String companyId) {
-    if (values.isEmpty) {
-      initValues();
-    }
-    return values[companyId] ?? [];
+    return _values;
   }
 
-  static void initValues() {
+  static List<Asset> getByCompany(String companyId) {
+    return _values[companyId] ?? [];
+  }
+
+  static Map<String, List<Asset>> _initValues() {
+    Map<String, List<Asset>> values = {};
     for (final company in Companies.values) {
       values[company.id] = [
         Asset(
@@ -102,9 +99,9 @@ class Assets {
           parentId: null,
           sensorType: null,
           status: null,
-        ),
+        )
       ];
     }
+    return values;
   }
-
 }
