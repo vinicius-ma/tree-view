@@ -7,4 +7,6 @@ class TractianColors {
   static const Color transparent = Color(0x00000000);
   static const Color darkGray =  Color(0xFF77818C);
   static const Color lightGray =  Color(0xFFEAEFF3);
+  static const Color green = Color(0xFF52C41A);
+  static const Color red = Color(0xFFED3833);
 }
