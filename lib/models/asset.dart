@@ -1,3 +1,4 @@
+import 'package:tractian_tree_view/models/asset_type.dart';
 import 'package:tractian_tree_view/models/sensor_status.dart';
 import 'package:tractian_tree_view/models/sensor_type.dart';
 
@@ -21,7 +22,18 @@ class Asset {
     String? sensorType,
     String? status,
   }){
-    this.sensorType = SensorType.fromName(sensorType ?? 'other');
-    this.status = SensorStatus.fromName(status ?? 'other');
+    this.sensorType = SensorType.fromName(sensorType);
+    this.status = SensorStatus.fromName(status);
+  }
+
+  bool hasParentOrLocation(){
+    return parentId != null || locationId != null;
+  }
+
+  AssetType? getType(){
+    if(sensorType != null) return AssetType.component;
+    if(hasParentOrLocation()) return AssetType.asset;
+    if(locationId  == null) return AssetType.location;
+    return null;
   }
 }
