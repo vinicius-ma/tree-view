@@ -1,8 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:tractian_tree_view/models/asset.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
+import 'package:tractian_tree_view/widgets/asset_expandable_item.dart';
+import 'package:tractian_tree_view/widgets/asset_item.dart';
 import 'package:tractian_tree_view/widgets/filter_button.dart';
 
-// TODO: Use the Assets class from tests
+import '../tests/assets.dart';
+
 class AssetsPage extends StatefulWidget {
   const AssetsPage({super.key});
 
@@ -81,66 +87,7 @@ class _AssetsPageState extends State<AssetsPage> {
           ),
           Expanded(
             child: ListView(
-              children: const [
-                AssetItem(
-                  title: 'PRODUCTION AREA - RAW MATERIAL',
-                  children: [
-                    AssetItem(
-                      title: 'CHARCOAL STORAGE SECTOR',
-                      children: [
-                        AssetItem(
-                          title: 'CONVEYOR BELT ASSEMBLY',
-                          children: [
-                            AssetItem(
-                              title: 'MOTOR TC01 COAL UNLOADING AF02',
-                              children: [
-                                AssetItem(
-                                  title: 'MOTOR RT COAL AF01',
-                                  icon: Icons.bolt,
-                                  iconColor: Colors.green,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    AssetItem(
-                      title: 'Machinery House',
-                      children: [
-                        AssetItem(
-                          title: 'MOTORS H12D',
-                          children: [
-                            AssetItem(
-                              title: 'MOTORS H12D - Stage 1',
-                              icon: Icons.error,
-                              iconColor: Colors.red,
-                            ),
-                            AssetItem(
-                              title: 'MOTORS H12D - Stage 2',
-                              icon: Icons.error,
-                              iconColor: Colors.red,
-                            ),
-                            AssetItem(
-                              title: 'MOTORS H12D - Stage 3',
-                              icon: Icons.error,
-                              iconColor: Colors.red,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                AssetItem(
-                  title: 'EMPTY MACHINE HOUSE',
-                ),
-                AssetItem(
-                  title: 'Fan - External',
-                  icon: Icons.bolt,
-                  iconColor: Colors.green,
-                ),
-              ],
+              children: getChildren(null, Assets.getByCompany("jaguarFakeId")),
             ),
           ),
         ],
@@ -149,31 +96,58 @@ class _AssetsPageState extends State<AssetsPage> {
   }
 }
 
-class AssetItem extends StatelessWidget {
-  final String title;
-  final List<AssetItem>? children;
-  final IconData? icon;
-  final Color? iconColor;
+List<Widget> getChildren(
+  Asset? parent,
+  List<Asset> companyAssets, {
+  int treeLevel = 0,
+}) {
+  String? parentId = parent?.id;
+  List<Asset> children =
+      companyAssets.where((test) => test.parentId == parentId).toList();
 
-  const AssetItem({
-    super.key,
-    required this.title,
-    this.children,
-    this.icon,
-    this.iconColor,
-  });
+  List<Widget> items = [];
 
-  @override
-  Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: Row(
-        children: [
-          if (icon != null) Icon(icon, color: iconColor),
-          const SizedBox(width: 8),
-          Text(title),
-        ],
-      ),
-      children: children ?? [],
-    );
+  if (children.isNotEmpty) {
+    // parent is expandable (if not null)
+    if (parent != null && parent.getType() != null) {
+      List<Widget> childrenItems = [];
+      for (Asset currentAsset in children) {
+        childrenItems.addAll(
+            getChildren(currentAsset, companyAssets, treeLevel: treeLevel + 1));
+      }
+
+      var item = AssetExpandableItem(
+        title: parent.name,
+        type: parent.getType()!,
+        treeLevel: treeLevel,
+        children: childrenItems,
+      );
+
+      items.add(item);
+    } else {
+      for (Asset currentAsset in children) {
+        items.addAll(getChildren(currentAsset, companyAssets,
+            treeLevel: treeLevel + 1));
+      }
+    }
+  } else {
+    // it is the lowest level in tree
+    if (parent != null && parent.getType() != null) {
+      items.add(AssetItem(
+        title: parent.name,
+        type: parent.getType()!,
+        sensorType: parent.sensorType,
+        status: parent.status,
+        treeLevel: treeLevel,
+      ));
+    }
   }
+
+  // put the AssetItems to the end
+  items.sort(
+      (a, b) => a.runtimeType.toString().compareTo(b.runtimeType.toString()));
+
+  log("getChildren: ${children.length} items has ${parent != null ? parent.name : "null"} as parent.");
+
+  return items;
 }
