@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/models/asset.dart';
+import 'package:tractian_tree_view/models/company.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
 import 'package:tractian_tree_view/widgets/asset_expandable_item.dart';
 import 'package:tractian_tree_view/widgets/asset_item.dart';
@@ -10,7 +11,9 @@ import 'package:tractian_tree_view/widgets/filter_button.dart';
 import '../tests/assets.dart';
 
 class AssetsPage extends StatefulWidget {
-  const AssetsPage({super.key});
+  final Company company;
+
+  const AssetsPage({super.key, required this.company});
 
   @override
   State<AssetsPage> createState() => _AssetsPageState();
