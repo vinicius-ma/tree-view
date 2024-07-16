@@ -36,4 +36,21 @@ class Asset {
     if(locationId  == null) return AssetType.location;
     return null;
   }
+
+    static List<Asset> fromMap(Map<String, List<dynamic>> map) {
+    List<Asset> assets = [];
+    map["assets"]?.forEach((asset) {
+      assets.add(Asset(
+        id: asset["id"],
+        name: asset["name"],
+        gatewayId: asset["gatewayId"],
+        locationId: asset["locationId"],
+        parentId: asset["parentId"],
+        sensorId: asset["sensorId"],
+        sensorType: asset["sensorType"],
+        status: asset["status"],
+      ));
+    });
+    return assets;
+  } 
 }
