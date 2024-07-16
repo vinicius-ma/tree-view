@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/models/asset_type.dart';
@@ -10,15 +9,13 @@ class AssetExpandableItem extends StatefulWidget {
   final int treeLevel;
   final List<Widget> children;
 
-  AssetExpandableItem({
+  const AssetExpandableItem({
     super.key,
     required this.title,
     required this.type,
     required this.treeLevel,
     this.children = const [],
-  }) {
-    log("AssetExpandableItem: $treeLevel  - $title");
-  }
+  });
 
   @override
   State<AssetExpandableItem> createState() => AssetExpandableItemState();
@@ -58,7 +55,6 @@ class AssetExpandableItemState extends State<AssetExpandableItem> {
   }
 
   void addChildren(List<Widget> children) {
-    log("ExpandableItem: addChildren: ${children.length}");
     setState(() {
       children.addAll(children);
     });

@@ -1,0 +1,4 @@
+enum ApiState {
+  isLoading,
+  done;
+}

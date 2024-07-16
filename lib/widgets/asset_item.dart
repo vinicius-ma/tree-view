@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/models/asset_type.dart';
@@ -13,16 +12,14 @@ class AssetItem extends StatelessWidget {
   final SensorType? sensorType;
   final int treeLevel;
 
-  AssetItem({
+  const AssetItem({
     super.key,
     required this.title,
     required this.type,
     required this.treeLevel,
     this.status,
     this.sensorType,
-  }){
-    log("AssetItem: $treeLevel  - $title");
-  }
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:tractian_tree_view/models/company.dart';
+import 'package:tractian_tree_view/screens/asset_screen.dart';
 import 'package:tractian_tree_view/widgets/elevated_button.dart';
 
 class UnitButton extends StatelessWidget {
   static const String iconPath = 'assets/images/icon_factory.png';
-  final String unitName;
+  final Company company;
 
-  const UnitButton({super.key, required this.unitName});
+  const UnitButton({super.key, required this.company});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class UnitButton extends StatelessWidget {
       width: 320,
       height: 80,
       iconPath: iconPath,
-      text: unitName,
+      text: company.name,
       colored: true,
       onPressed: () {
         navigateToAssets(context);
@@ -22,6 +24,7 @@ class UnitButton extends StatelessWidget {
   }
 
   void navigateToAssets(BuildContext context) {
-    Navigator.pushNamed(context, '/assets');
+    Navigator.push(context, 
+      MaterialPageRoute(builder: (context) => AssetsPage(company: company)));
   }
 }
