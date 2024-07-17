@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:tractian_tree_view/models/asset.dart';
 import 'package:tractian_tree_view/models/company.dart';
+import 'package:tractian_tree_view/models/location.dart';
 
 class ApiService {
 
@@ -26,23 +27,30 @@ class ApiService {
   }
 
   Future<List<Asset>> getAssets(String companyId) async {
-    List<Response> responses = [];
     List<Asset> receivedAssets = [];
-    List<int> lengths = [];
-    responses.add(await _dio.get("$baseUrl/companies/$companyId/locations"));
-    responses.add(await _dio.get("$baseUrl/companies/$companyId/assets"));
 
-    for (var response in responses) {
-      if(response.data is List<dynamic> && response.data.isNotEmpty) {
-        Map<String, List<dynamic>> map = {};
-        map["assets"] = response.data;
-        var fromMap = Asset.fromMap(map);
-        lengths.add(fromMap.length);
-        receivedAssets.addAll(fromMap);
-      }
+    Response locationResponse = await _dio.get("$baseUrl/companies/$companyId/locations");
+    Response assetResponse = await _dio.get("$baseUrl/companies/$companyId/assets");
+    int numLocations = 0, numAssets = 0;
+
+    if(locationResponse.data is List<dynamic> && locationResponse.data.isNotEmpty) {
+      Map<String, List<dynamic>> map = {};
+      map["locations"] = locationResponse.data;
+      var fromMap = Location.fromMap(map);
+      numLocations = fromMap.length;
+      receivedAssets.addAll(fromMap);
     }
+
+    if(assetResponse.data is List<dynamic> && assetResponse.data.isNotEmpty) {
+      Map<String, List<dynamic>> map = {};
+      map["assets"] = assetResponse.data;
+      var fromMap = Asset.fromMap(map);
+      numAssets = fromMap.length;
+      receivedAssets.addAll(fromMap);
+    }
+
     log("ApiService: receivedAssets from $companyId: ${receivedAssets.length} " 
-        "(${lengths[0]} locations, ${lengths[1]} assets)");
+        "($numLocations locations, $numAssets assets)");
     return receivedAssets;
   }
 }

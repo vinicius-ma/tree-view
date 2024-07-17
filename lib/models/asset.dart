@@ -1,3 +1,4 @@
+
 import 'package:tractian_tree_view/models/asset_type.dart';
 import 'package:tractian_tree_view/models/sensor_status.dart';
 import 'package:tractian_tree_view/models/sensor_type.dart';
@@ -11,6 +12,7 @@ class Asset {
   final String? sensorId;
   SensorType? sensorType;
   SensorStatus? status;
+  late AssetType type;
 
   Asset({
     required this.id,
@@ -24,20 +26,20 @@ class Asset {
   }){
     this.sensorType = SensorType.fromName(sensorType);
     this.status = SensorStatus.fromName(status);
+    type = getType();
   }
 
-  bool hasParentOrLocation(){
+  bool _hasParentOrLocation(){
     return parentId != null || locationId != null;
   }
 
-  AssetType? getType(){
+  AssetType getType(){
     if(sensorType != null) return AssetType.component;
-    if(hasParentOrLocation()) return AssetType.asset;
-    if(locationId  == null) return AssetType.location;
-    return null;
+    if(_hasParentOrLocation()) return AssetType.asset;
+    return AssetType.unknown;
   }
 
-    static List<Asset> fromMap(Map<String, List<dynamic>> map) {
+  static List<Asset> fromMap(Map<String, List<dynamic>> map) {
     List<Asset> assets = [];
     map["assets"]?.forEach((asset) {
       assets.add(Asset(

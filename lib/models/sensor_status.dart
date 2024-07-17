@@ -3,7 +3,7 @@ import 'package:tractian_tree_view/theme/colors.dart';
 
 enum SensorStatus {
   operating("operating"),
-  critical("critical", icon:"error", color: TractianColors.red),
+  critical("alert", icon:"error", color: TractianColors.red),
   other("other");
 
   final String name;

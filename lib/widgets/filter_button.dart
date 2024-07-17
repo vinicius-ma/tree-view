@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tractian_tree_view/widgets/elevated_button.dart';
 
 class FilterButton extends StatefulWidget {
@@ -32,8 +31,6 @@ class _FilterButtonState extends State<FilterButton> {
           pressed = !pressed;
           widget.onPressed(pressed);
         });
-        Fluttertoast.showToast(
-            msg: 'Filtro ${widget.text} ${pressed ? 'ativado' : 'desativado'}');
       },
       colored: pressed,
     );
