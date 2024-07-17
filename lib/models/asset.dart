@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:tractian_tree_view/models/asset_type.dart';
 import 'package:tractian_tree_view/models/sensor_status.dart';
@@ -28,7 +27,6 @@ class Asset {
     this.sensorType = SensorType.fromName(sensorType);
     this.status = SensorStatus.fromName(status);
     type = getType();
-    log("Asset constructor: assetType = $type");
   }
 
   bool _hasParentOrLocation(){
