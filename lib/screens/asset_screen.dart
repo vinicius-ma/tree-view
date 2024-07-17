@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:tractian_tree_view/models/asset.dart';
 import 'package:tractian_tree_view/models/company.dart';
+import 'package:tractian_tree_view/models/sensor_status.dart';
+import 'package:tractian_tree_view/models/sensor_type.dart';
 import 'package:tractian_tree_view/services/api_service.dart';
 import 'package:tractian_tree_view/theme/colors.dart';
 import 'package:tractian_tree_view/widgets/asset_expandable_item.dart';
@@ -67,6 +69,13 @@ class _AssetsPageState extends State<AssetsPage> {
     List<Asset> newAssets = await apiService.getAssets(companyId);
     setState(() {
       assets = newAssets;
+    });
+  }
+  
+  setFilters({bool filterEnergy = false, bool filterCritical = false}) {
+    setState(() {
+      filterEnergy = filterEnergy;
+      filterCritical = filterCritical;
     });
   }
 
@@ -135,30 +144,35 @@ class _AssetsPageState extends State<AssetsPage> {
     int treeLevel = 0,
   }) {
     String? parentId = parent?.id;
-    List<Asset> children =
-        companyAssets.where((test) => test.parentId == parentId).toList();
-    
-    log("getChildren: ${parent?.name} has ${children.length} children");
+    List<Asset> children = companyAssets
+        .where(
+            (test) => test.locationId == parentId || test.parentId == parentId)
+        .toList();
 
     List<Widget> items = [];
 
     if (children.isNotEmpty) {
       // parent is expandable (if not null)
-      if (parent != null && parent.getType() != null) {
+      if (parent != null) {
         List<Widget> childrenItems = [];
         for (Asset currentAsset in children) {
-          childrenItems.addAll(getChildren(currentAsset, companyAssets,
-              treeLevel: treeLevel + 1));
+          var children = getChildren(currentAsset, companyAssets,
+              treeLevel: treeLevel + 1);
+          childrenItems.addAll(children);
         }
-
+        //  in the case of expandable,
+        // only add the parent if it has children
+        if(childrenItems.isNotEmpty) {
         var item = AssetExpandableItem(
           title: parent.name,
-          type: parent.getType()!,
+            type: parent.getType(),
           treeLevel: treeLevel,
           children: childrenItems,
         );
 
         items.add(item);
+        }
+
       } else {
         for (Asset currentAsset in children) {
           items.addAll(getChildren(currentAsset, companyAssets,
@@ -167,14 +181,18 @@ class _AssetsPageState extends State<AssetsPage> {
       }
     } else {
       // it is the lowest level in tree
-      if (parent != null && parent.getType() != null) {
+      if (parent != null) {
+        if ((filterEnergy && parent.sensorType == SensorType.energy) ||
+            (filterCritical && parent.status == SensorStatus.critical) ||
+            (!filterEnergy && !filterCritical)) {
         items.add(AssetItem(
           title: parent.name,
-          type: parent.getType()!,
+            type: parent.getType(),
           sensorType: parent.sensorType,
           status: parent.status,
           treeLevel: treeLevel,
         ));
+        }
       }
     }
     return items;
