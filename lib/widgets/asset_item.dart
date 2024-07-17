@@ -40,10 +40,10 @@ class AssetItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 )),
           ),
-          status?.icon != null
-              ? statusIcon() : Container(),
-              sensorType?.icon != null 
-              ? sensorIcon() : Container(),
+          status?.icon != null ? 
+            statusIcon() : 
+              sensorType?.icon != null ?
+                sensorIcon() : Container(),
         ],
       ),
     );
