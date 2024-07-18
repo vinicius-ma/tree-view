@@ -1,7 +1,7 @@
 
-import 'package:tractian_tree_view/models/asset_type.dart';
-import 'package:tractian_tree_view/models/sensor_status.dart';
-import 'package:tractian_tree_view/models/sensor_type.dart';
+import 'asset_type.dart';
+import 'sensor_status.dart';
+import 'sensor_type.dart';
 
 class Asset {
   final String id;

@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/models/asset_type.dart';
-import 'package:tractian_tree_view/theme/colors.dart';
+import '../models/asset_type.dart';
+import '../theme/colors.dart';
 
 class AssetExpandableItem extends StatefulWidget {
   final String title;

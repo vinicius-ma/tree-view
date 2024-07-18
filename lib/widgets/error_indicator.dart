@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/theme/colors.dart';
+import '../theme/colors.dart';
 
 class ErrorIndicator extends StatelessWidget {
   final String? error;

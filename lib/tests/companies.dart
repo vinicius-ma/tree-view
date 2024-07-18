@@ -1,4 +1,4 @@
-import 'package:tractian_tree_view/models/company.dart';
+import '../models/company.dart';
 
 class Companies {
   static const List<Company> values = [

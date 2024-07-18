@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/models/company.dart';
-import 'package:tractian_tree_view/services/api_service.dart';
-import 'package:tractian_tree_view/services/api_state.dart';
-import 'package:tractian_tree_view/theme/colors.dart';
-import 'package:tractian_tree_view/widgets/error_indicator.dart';
-import 'package:tractian_tree_view/widgets/loading_indicator.dart';
-import 'package:tractian_tree_view/widgets/unit_button.dart';
+import '../models/company.dart';
+import '../services/api_service.dart';
+import '../services/api_state.dart';
+import '../theme/colors.dart';
+import '../widgets/error_indicator.dart';
+import '../widgets/loading_indicator.dart';
+import '../widgets/unit_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

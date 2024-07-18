@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/screens/home_screen.dart';
-import 'package:tractian_tree_view/theme/colors.dart';
+import 'screens/home_screen.dart';
+import 'theme/colors.dart';
 
 void main() {
   runApp(const MyApp());

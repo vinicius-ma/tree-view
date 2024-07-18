@@ -2,16 +2,14 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/models/asset.dart';
-import 'package:tractian_tree_view/models/company.dart';
-import 'package:tractian_tree_view/models/sensor_status.dart';
-import 'package:tractian_tree_view/models/sensor_type.dart';
-import 'package:tractian_tree_view/services/api_service.dart';
-import 'package:tractian_tree_view/theme/colors.dart';
-import 'package:tractian_tree_view/widgets/asset_expandable_item.dart';
-import 'package:tractian_tree_view/widgets/asset_item.dart';
-import 'package:tractian_tree_view/widgets/filter_button.dart';
-import 'package:tractian_tree_view/widgets/loading_indicator.dart';
+import '../models/asset.dart';
+import '../models/company.dart';
+import '../services/api_service.dart';
+import '../theme/colors.dart';
+import '../widgets/asset_expandable_item.dart';
+import '../widgets/asset_item.dart';
+import '../widgets/filter_button.dart';
+import '../widgets/loading_indicator.dart';
 
 class AssetsPage extends StatefulWidget {
   final Company company;
