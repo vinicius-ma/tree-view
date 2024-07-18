@@ -25,6 +25,10 @@ class AssetsPage extends StatefulWidget {
 class _AssetsPageState extends State<AssetsPage> {
   static ApiService apiService = ApiService();
 
+  bool _isLoading = true;
+
+  final fieldText = TextEditingController();
+
   List<Asset> assets = [];
   List<Widget> widgets = [];
 
@@ -49,26 +53,40 @@ class _AssetsPageState extends State<AssetsPage> {
         backgroundColor: TractianColors.darkBlue,
         foregroundColor: TractianColors.white,
       ),
-      body: Column(
+      body: assetBody(),
+    );
+  }
+
+  Widget assetBody() {
+    return Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
             child: Column(
-              children: [searchBar(), filterBar()],
+            children: [
+              searchBar(),
+              (_isLoading || widgets.isNotEmpty) && searchText.isEmpty
+                  ? filterBar()
+                  : Container(),
+            ],
             ),
+        ),
+        Divider(
+                      color: Colors.black.withOpacity(0.1),
           ),
           assetsList(),
         ],
-      ),
     );
   }
 
   Future<void> getAssetsFromApi() async {
     log('getAssetsFromApi');
-    List<Asset> newAssets = await apiService.getAssets(companyId);
+    setLoading(true);
+    List<Asset> newAssets = await apiService.getAssets(widget.company.id);
     setState(() {
       assets = newAssets;
     });
+    setLoading(false);
   }
 
   getWidgets() {
@@ -85,12 +103,24 @@ class _AssetsPageState extends State<AssetsPage> {
     });
   }
 
-  Expanded assetsList() {
+  setLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
+
+  Widget assetsList() {
+    if (_isLoading) {
+      return const LoadingIndicator();
+    }
+    if (widgets.isNotEmpty) {
     return Expanded(
       child: ListView(
-        children: getChildren(null, assets),
+          children: widgets,
       ),
     );
+    }
+    return const Text('Nenhum item encontrado');
   }
 
   Widget filterBar() {
@@ -132,16 +162,33 @@ class _AssetsPageState extends State<AssetsPage> {
               ),
               filled: true,
               fillColor: TractianColors.lightGray,
+              suffixIcon: searchText.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: clearText,
+                    )
+                  : null,
             ),
             style: const TextStyle(color: TractianColors.darkGray),
+            onChanged: (value) {
+              setState(() {
+                filterEnergy = false;
+                filterCritical = false;
+                searchText = value;
+              });
+            },
+            controller: fieldText,
           ),
         ),
       ],
     );
   }
 
-  Widget assetBody() {
-    return assets.isNotEmpty ? assetsList() : const LoadingIndicator();
+  void clearText() {
+    fieldText.clear();
+    setState(() {
+      searchText = "";
+    });
   }
 
   List<Widget> getChildren(
