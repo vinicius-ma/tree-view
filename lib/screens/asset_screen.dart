@@ -47,7 +47,11 @@ class _AssetsPageState extends State<AssetsPage> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Assets'),
+        title: const Text(
+          'Assets',
+          textAlign: TextAlign.center,
+        ),
+        centerTitle: true,
         backgroundColor: TractianColors.darkBlue,
         foregroundColor: TractianColors.white,
       ),
