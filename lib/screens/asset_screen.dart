@@ -26,17 +26,16 @@ class _AssetsPageState extends State<AssetsPage> {
   static ApiService apiService = ApiService();
 
   List<Asset> assets = [];
-  String companyId = "";
+  List<Widget> widgets = [];
 
+  String searchText = "";
   bool filterEnergy = false;
   bool filterCritical = false;
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      companyId = widget.company.id;
-    });
     if (assets.isEmpty) getAssetsFromApi();
+    getWidgets();
     return Scaffold(
       backgroundColor: TractianColors.white,
       appBar: AppBar(
@@ -71,6 +70,13 @@ class _AssetsPageState extends State<AssetsPage> {
       assets = newAssets;
     });
   }
+
+  getWidgets() {
+    var aux =  getChildren(null, assets);
+    setState(() {
+      widgets = aux;
+    });
+  }
   
   setFilters({bool filterEnergy = false, bool filterCritical = false}) {
     setState(() {
@@ -87,7 +93,7 @@ class _AssetsPageState extends State<AssetsPage> {
     );
   }
 
-  Row filterBar() {
+  Widget filterBar() {
     return Row(children: [
       const SizedBox(width: 8),
       FilterButton(
@@ -142,6 +148,7 @@ class _AssetsPageState extends State<AssetsPage> {
     Asset? parent,
     List<Asset> companyAssets, {
     int treeLevel = 0,
+    bool bypassSearchText = false,
   }) {
     String? parentId = parent?.id;
     List<Asset> children = companyAssets
@@ -155,36 +162,48 @@ class _AssetsPageState extends State<AssetsPage> {
       // parent is expandable (if not null)
       if (parent != null) {
         List<Widget> childrenItems = [];
+
+        var parentFoundByName =
+            searchText.isNotEmpty && parent.contains(searchText);
+
         for (Asset currentAsset in children) {
           var children = getChildren(currentAsset, companyAssets,
-              treeLevel: treeLevel + 1);
+              treeLevel: treeLevel + 1,
+              bypassSearchText: parentFoundByName | bypassSearchText);
           childrenItems.addAll(children);
         }
+
         //  in the case of expandable,
         // only add the parent if it has children
-        if(childrenItems.isNotEmpty) {
+        // or matches the searching text
+        if (childrenItems.isNotEmpty || parentFoundByName || bypassSearchText) {
         var item = AssetExpandableItem(
           title: parent.name,
             type: parent.getType(),
           treeLevel: treeLevel,
           children: childrenItems,
         );
-
         items.add(item);
         }
-
       } else {
-        for (Asset currentAsset in children) {
-          items.addAll(getChildren(currentAsset, companyAssets,
-              treeLevel: treeLevel + 1));
+        for (Asset current in children) {
+          var currentAssetFoundByName =
+              searchText.isNotEmpty && current.contains(searchText);
+          items.addAll(getChildren(
+            current,
+            companyAssets,
+            treeLevel: treeLevel + 1,
+            bypassSearchText: currentAssetFoundByName | bypassSearchText,
+          ));
         }
       }
     } else {
       // it is the lowest level in tree
       if (parent != null) {
-        if ((filterEnergy && parent.sensorType == SensorType.energy) ||
-            (filterCritical && parent.status == SensorStatus.critical) ||
-            (!filterEnergy && !filterCritical)) {
+        if ((filterEnergy && parent.isEnergy() || !filterEnergy) &&
+            (filterCritical && parent.isCritical() || !filterCritical) &&
+            (searchText.isNotEmpty && parent.contains(searchText) ||
+                searchText.isEmpty || bypassSearchText)) {
         items.add(AssetItem(
           title: parent.name,
             type: parent.getType(),

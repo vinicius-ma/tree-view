@@ -39,6 +39,10 @@ class Asset {
     return AssetType.unknown;
   }
 
+  bool isEnergy() => sensorType == SensorType.energy;
+  bool isCritical() => status == SensorStatus.critical;
+  bool contains(String text) => name.toLowerCase().contains(text.trim().toLowerCase());
+
   static List<Asset> fromMap(Map<String, List<dynamic>> map) {
     List<Asset> assets = [];
     map["assets"]?.forEach((asset) {
