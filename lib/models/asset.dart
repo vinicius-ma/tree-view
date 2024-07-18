@@ -1,7 +1,7 @@
 
-import 'package:tractian_tree_view/models/asset_type.dart';
-import 'package:tractian_tree_view/models/sensor_status.dart';
-import 'package:tractian_tree_view/models/sensor_type.dart';
+import 'asset_type.dart';
+import 'sensor_status.dart';
+import 'sensor_type.dart';
 
 class Asset {
   final String id;
@@ -38,6 +38,10 @@ class Asset {
     if(_hasParentOrLocation()) return AssetType.asset;
     return AssetType.unknown;
   }
+
+  bool isEnergy() => sensorType == SensorType.energy;
+  bool isCritical() => status == SensorStatus.critical;
+  bool contains(String text) => name.toLowerCase().contains(text.trim().toLowerCase());
 
   static List<Asset> fromMap(Map<String, List<dynamic>> map) {
     List<Asset> assets = [];

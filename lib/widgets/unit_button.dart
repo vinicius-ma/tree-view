@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/models/company.dart';
-import 'package:tractian_tree_view/screens/asset_screen.dart';
-import 'package:tractian_tree_view/widgets/elevated_button.dart';
+import '../models/company.dart';
+import '../screens/asset_screen.dart';
+import 'elevated_button.dart';
 
 class UnitButton extends StatelessWidget {
   static const String iconPath = 'assets/images/icon_factory.png';

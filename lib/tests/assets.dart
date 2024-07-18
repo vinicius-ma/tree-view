@@ -1,6 +1,6 @@
 
-import 'package:tractian_tree_view/models/asset.dart';
-import 'package:tractian_tree_view/tests/companies.dart';
+import '../models/asset.dart';
+import 'companies.dart';
 
 class Assets {
 

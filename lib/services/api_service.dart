@@ -3,9 +3,9 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
-import 'package:tractian_tree_view/models/asset.dart';
-import 'package:tractian_tree_view/models/company.dart';
-import 'package:tractian_tree_view/models/location.dart';
+import '../models/asset.dart';
+import '../models/company.dart';
+import '../models/location.dart';
 
 class ApiService {
 

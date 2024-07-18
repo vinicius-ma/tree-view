@@ -1,5 +1,5 @@
-import 'package:tractian_tree_view/models/asset.dart';
-import 'package:tractian_tree_view/models/asset_type.dart';
+import 'asset.dart';
+import 'asset_type.dart';
 
 class Location extends Asset{
   Location({

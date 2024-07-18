@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/models/asset_type.dart';
-import 'package:tractian_tree_view/models/sensor_status.dart';
-import 'package:tractian_tree_view/models/sensor_type.dart';
-import 'package:tractian_tree_view/theme/colors.dart';
+import '../models/asset_type.dart';
+import '../models/sensor_status.dart';
+import '../models/sensor_type.dart';
+import '../theme/colors.dart';
 
 class AssetItem extends StatelessWidget {
   final String title;

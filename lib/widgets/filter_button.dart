@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tractian_tree_view/widgets/elevated_button.dart';
+import 'elevated_button.dart';
 
 class FilterButton extends StatefulWidget {
   final String assetName;
