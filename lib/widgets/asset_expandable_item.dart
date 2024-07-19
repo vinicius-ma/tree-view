@@ -6,14 +6,12 @@ import '../theme/colors.dart';
 class AssetExpandableItem extends StatefulWidget {
   final String title;
   final AssetType type;
-  final int treeLevel;
   final List<Widget> children;
 
   const AssetExpandableItem({
     super.key,
     required this.title,
     required this.type,
-    required this.treeLevel,
     this.children = const [],
   });
 

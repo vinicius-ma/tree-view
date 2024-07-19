@@ -10,13 +10,11 @@ class AssetItem extends StatelessWidget {
   final AssetType type;
   final SensorStatus? status;
   final SensorType? sensorType;
-  final int treeLevel;
 
   const AssetItem({
     super.key,
     required this.title,
     required this.type,
-    required this.treeLevel,
     this.status,
     this.sensorType,
   });
@@ -24,7 +22,7 @@ class AssetItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: (8 * treeLevel).toDouble()),
+      padding: const EdgeInsets.only(left: 24),
       child: Row(
         children: [
           ImageIcon(

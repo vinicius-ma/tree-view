@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import '../models/asset.dart';
@@ -24,20 +23,18 @@ class _AssetsPageState extends State<AssetsPage> {
   static ApiService apiService = ApiService();
 
   bool _isLoading = true;
+  bool filterEnergy = false;
+  bool filterCritical = false;
+  String searchText = "";
 
   final fieldText = TextEditingController();
 
-  List<Asset> assets = [];
-  List<Widget> widgets = [];
-
-  String searchText = "";
-  bool filterEnergy = false;
-  bool filterCritical = false;
+  Map<Asset?, List<Asset>> _map = {};
+  List<Widget> _widgets = [];
 
   @override
   Widget build(BuildContext context) {
-    if (assets.isEmpty) getAssetsFromApi();
-    getWidgets();
+    if (_map.isEmpty) getMapFromApi();
     return Scaffold(
       backgroundColor: TractianColors.white,
       appBar: AppBar(
@@ -61,43 +58,39 @@ class _AssetsPageState extends State<AssetsPage> {
 
   Widget assetBody() {
     return Column(
-        children: [
-          Padding(
+      children: [
+        Padding(
           padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-            child: Column(
+          child: Column(
             children: [
               searchBar(),
-              (_isLoading || widgets.isNotEmpty) && searchText.isEmpty
+              (_isLoading || _map.values.isNotEmpty) && searchText.isEmpty
                   ? filterBar()
                   : Container(),
             ],
-            ),
+          ),
         ),
         Divider(
-                      color: Colors.black.withOpacity(0.1),
-          ),
-          assetsList(),
-        ],
+          color: Colors.black.withOpacity(0.1),
+        ),
+        assetsList(),
+      ],
     );
   }
 
-  Future<void> getAssetsFromApi() async {
-    log('getAssetsFromApi');
+  Future<void> getMapFromApi() async {
     setLoading(true);
-    List<Asset> newAssets = await apiService.getAssets(widget.company.id);
+    List<Asset> assets = await apiService.getAssets(widget.company.id);
+    var map = await getChildren(null, assets, {});
+    var widgets = await getWidgets(null, map);
     setState(() {
-      assets = newAssets;
+      _widgets = widgets;
+      _map = map;
     });
+
     setLoading(false);
   }
 
-  getWidgets() {
-    var aux =  getChildren(null, assets);
-    setState(() {
-      widgets = aux;
-    });
-  }
-  
   setFilters({bool filterEnergy = false, bool filterCritical = false}) {
     setState(() {
       filterEnergy = filterEnergy;
@@ -115,14 +108,38 @@ class _AssetsPageState extends State<AssetsPage> {
     if (_isLoading) {
       return const LoadingIndicator();
     }
-    if (widgets.isNotEmpty) {
-    return Expanded(
-      child: ListView(
-          children: widgets,
-      ),
-    );
+    if (_map.values.isNotEmpty) {
+      return Expanded(
+        child: ListView(
+          children: _widgets,
+        ),
+      );
     }
     return const Text('Nenhum item encontrado');
+  }
+
+  Future<List<Widget>> getWidgets(
+      Asset? parent, Map<Asset?, List<Asset>> map) async {
+    List<Widget> widgets = [];
+    for (Asset child in map[parent]!) {
+      // child has children
+      if (map[child]!.isNotEmpty) {
+        var grandchildren = await getWidgets(child, map);
+        widgets.add(AssetExpandableItem(
+          title: child.name,
+          type: child.type,
+          children: grandchildren,
+        ));
+      } else {
+        widgets.add(AssetItem(
+          title: child.name,
+          type: child.type,
+          status: child.status,
+          sensorType: child.sensorType,
+        ));
+      }
+    }
+    return widgets;
   }
 
   Widget filterBar() {
@@ -193,76 +210,24 @@ class _AssetsPageState extends State<AssetsPage> {
     });
   }
 
-  List<Widget> getChildren(
+  Future<Map<Asset?, List<Asset>>> getChildren(
     Asset? parent,
-    List<Asset> companyAssets, {
-    int treeLevel = 0,
-    bool bypassSearchText = false,
-  }) {
-    String? parentId = parent?.id;
-    List<Asset> children = companyAssets
-        .where(
-            (test) => test.locationId == parentId || test.parentId == parentId)
-        .toList();
+    List<Asset> allAssets,
+    Map<Asset?, List<Asset>> map,
+  ) async {
+    map[parent] = allAssets
+        .where((child) => parent != null
+            ? child.parentId == parent.id || child.locationId == parent.id
+            : child.parentId == null && child.locationId == null)
+        .toList();      
 
-    List<Widget> items = [];
+    var children = map[parent]!;
 
-    if (children.isNotEmpty) {
-      // parent is expandable (if not null)
-      if (parent != null) {
-        List<Widget> childrenItems = [];
-
-        var parentFoundByName =
-            searchText.isNotEmpty && parent.contains(searchText);
-
-        for (Asset currentAsset in children) {
-          var children = getChildren(currentAsset, companyAssets,
-              treeLevel: treeLevel + 1,
-              bypassSearchText: parentFoundByName | bypassSearchText);
-          childrenItems.addAll(children);
-        }
-
-        //  in the case of expandable,
-        // only add the parent if it has children
-        // or matches the searching text
-        if (childrenItems.isNotEmpty || parentFoundByName || bypassSearchText) {
-        var item = AssetExpandableItem(
-          title: parent.name,
-            type: parent.getType(),
-          treeLevel: treeLevel,
-          children: childrenItems,
-        );
-        items.add(item);
-        }
-      } else {
-        for (Asset current in children) {
-          var currentAssetFoundByName =
-              searchText.isNotEmpty && current.contains(searchText);
-          items.addAll(getChildren(
-            current,
-            companyAssets,
-            treeLevel: treeLevel + 1,
-            bypassSearchText: currentAssetFoundByName | bypassSearchText,
-          ));
-        }
-      }
-    } else {
-      // it is the lowest level in tree
-      if (parent != null) {
-        if ((filterEnergy && parent.isEnergy() || !filterEnergy) &&
-            (filterCritical && parent.isCritical() || !filterCritical) &&
-            (searchText.isNotEmpty && parent.contains(searchText) ||
-                searchText.isEmpty || bypassSearchText)) {
-        items.add(AssetItem(
-          title: parent.name,
-            type: parent.getType(),
-          sensorType: parent.sensorType,
-          status: parent.status,
-          treeLevel: treeLevel,
-        ));
-        }
-      }
+    for (Asset child in children) {
+      var map2 = await getChildren(child, allAssets, map);
+      var grandchildren = map2[child];
+      map[child] = grandchildren ?? [];
     }
-    return items;
+    return map;
   }
 }
