@@ -32,9 +32,18 @@ class _AssetsPageState extends State<AssetsPage> {
   Map<Asset?, List<Asset>> _map = {};
   List<Widget> _widgets = [];
 
+  // TODO maybe use a FutureBuilder instead of this
+  @override
+  void initState() {
+    super.initState();
+    var future = getMapFromApi();
+    future.then(
+      (value) => setState(() => _map = value),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_map.isEmpty) getMapFromApi();
     return Scaffold(
       backgroundColor: TractianColors.white,
       appBar: AppBar(
@@ -78,17 +87,17 @@ class _AssetsPageState extends State<AssetsPage> {
     );
   }
 
-  Future<void> getMapFromApi() async {
+  Future<Map<Asset?, List<Asset>>> getMapFromApi() async {
     setLoading(true);
     List<Asset> assets = await apiService.getAssets(widget.company.id);
-    var map = await getChildren(null, assets, {});
-    var widgets = await getWidgets(null, map);
+    // TODO the UI freezes at this point with a large number of assets
+    var map = getChildren(null, assets, {});
+    var widgets = getWidgets(null, map);
     setState(() {
       _widgets = widgets;
-      _map = map;
     });
-
     setLoading(false);
+    return map;
   }
 
   setFilters({bool filterEnergy = false, bool filterCritical = false}) {
@@ -118,13 +127,12 @@ class _AssetsPageState extends State<AssetsPage> {
     return const Text('Nenhum item encontrado');
   }
 
-  Future<List<Widget>> getWidgets(
-      Asset? parent, Map<Asset?, List<Asset>> map) async {
+  List<Widget> getWidgets(Asset? parent, Map<Asset?, List<Asset>> map) {
     List<Widget> widgets = [];
     for (Asset child in map[parent]!) {
       // child has children
       if (map[child]!.isNotEmpty) {
-        var grandchildren = await getWidgets(child, map);
+        var grandchildren = getWidgets(child, map);
         widgets.add(AssetExpandableItem(
           title: child.name,
           type: child.type,
@@ -210,11 +218,11 @@ class _AssetsPageState extends State<AssetsPage> {
     });
   }
 
-  Future<Map<Asset?, List<Asset>>> getChildren(
+  Map<Asset?, List<Asset>> getChildren(
     Asset? parent,
     List<Asset> allAssets,
     Map<Asset?, List<Asset>> map,
-  ) async {
+  ) {
     map[parent] = allAssets
         .where((child) => parent != null
             ? child.parentId == parent.id || child.locationId == parent.id
@@ -224,7 +232,7 @@ class _AssetsPageState extends State<AssetsPage> {
     var children = map[parent]!;
 
     for (Asset child in children) {
-      var map2 = await getChildren(child, allAssets, map);
+      var map2 = getChildren(child, allAssets, map);
       var grandchildren = map2[child];
       map[child] = grandchildren ?? [];
     }
