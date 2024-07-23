@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../models/asset.dart';
@@ -86,7 +85,6 @@ class _AssetsPageState extends State<AssetsPage> {
 
   Future<void> getMapFromApi() async {
     setLoading(true);
-    log("getMapFromApi: starting");
     List<Asset> assets = await apiService.getAssets(widget.company.id);
 
     var result = await compute(_buildTree, assets);
@@ -233,17 +231,27 @@ class _AssetsPageState extends State<AssetsPage> {
 
   List<Asset> filterAssets(List<Asset> assets) {
     List<Asset> filteredAssets = [];
+    //Set<Asset> visited = {};
 
     for (Asset asset in assets) {
-      final matchesSearchText = searchText.isEmpty || asset.name.toLowerCase().contains(searchText.toLowerCase());
-      final matchesEnergyFilter = !filterEnergy || asset.sensorType == SensorType.energy;
-      final matchesCriticalFilter = !filterCritical || asset.status == SensorStatus.critical;
+      final matchesSearchText = searchText.isEmpty ||
+          asset.name.toLowerCase().contains(searchText.toLowerCase());
+      final matchesEnergyFilter =
+          !filterEnergy || asset.sensorType == SensorType.energy;
+      final matchesCriticalFilter =
+          !filterCritical || asset.status == SensorStatus.critical;
 
       if (matchesSearchText && matchesEnergyFilter && matchesCriticalFilter) {
+        // TODO: if the functions below work, remove this
         filteredAssets.add(asset);
+        // TODO: something is wrong down here
+        // addAssetAndAncestors(filteredAssets, visited, asset);
+        // addDescendants(filteredAssets, visited, asset);
       } else if (hasFilteredDescendant(asset)) {
+        // TODO: if the functions above work, remove this
         filteredAssets.add(asset);
       }
+
     }
 
     return filteredAssets;
@@ -259,5 +267,43 @@ class _AssetsPageState extends State<AssetsPage> {
     }
 
     return false;
+  }
+
+  void addAssetAndAncestors(
+      List<Asset> filteredAssets, Set<Asset> visited, Asset asset) {
+    if (visited.contains(asset)) return;
+    visited.add(asset);
+
+    filteredAssets.add(asset);
+    Asset? parent = _findParent(asset);
+
+    if (parent != null) {
+      addAssetAndAncestors(filteredAssets, visited, parent);
+    }
+  }
+
+  void addDescendants(
+      List<Asset> filteredAssets, Set<Asset> visited, Asset asset) {
+    if (visited.contains(asset)) return;
+    visited.add(asset);
+
+    if (!filteredAssets.contains(asset)) {
+      filteredAssets.add(asset);
+    }
+
+    if (_map[asset] != null) {
+      for (Asset child in _map[asset]!) {
+        addDescendants(filteredAssets, visited, child);
+      }
+    }
+  }
+
+  Asset? _findParent(Asset asset) {
+    for (Asset? key in _map.keys) {
+      if (_map[key]?.contains(asset) ?? false) {
+        return key;
+      }
+    }
+    return null;
   }
 }
