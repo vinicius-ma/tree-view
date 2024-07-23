@@ -29,14 +29,9 @@ class Asset {
     type = getType();
   }
 
-  bool _hasParentOrLocation(){
-    return parentId != null || locationId != null;
-  }
-
   AssetType getType(){
     if(sensorType != null) return AssetType.component;
-    if(_hasParentOrLocation()) return AssetType.asset;
-    return AssetType.unknown;
+    return AssetType.asset;
   }
 
   bool isEnergy() => sensorType == SensorType.energy;
