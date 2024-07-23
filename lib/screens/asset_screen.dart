@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/asset.dart';
 import '../models/company.dart';
 import '../models/sensor_status.dart';
@@ -87,14 +87,12 @@ class _AssetsPageState extends State<AssetsPage> {
     setLoading(true);
     log("getMapFromApi: starting");
     List<Asset> assets = await apiService.getAssets(widget.company.id);
-    log("getMapFromApi: ended");
+
+    var result = await compute(_buildTree, assets);
+
     setState(() {
-      log("getChildren: starting");
-      _map = getChildren(null, assets, {});
-      log("getChildren: ended");
-      log("getWidgets: starting");
+      _map = result;
       _widgets = getWidgets(null, _map);
-      log("getWidgets: ended");
       setLoading(false);
     });
   }
@@ -210,7 +208,11 @@ class _AssetsPageState extends State<AssetsPage> {
     });
   }
 
-  Map<Asset?, List<Asset>> getChildren(
+  static Map<Asset?, List<Asset>> _buildTree(List<Asset> assets) {
+    return _getChildren(null, assets, {});
+  }
+
+  static Map<Asset?, List<Asset>> _getChildren(
     Asset? parent,
     List<Asset> allAssets,
     Map<Asset?, List<Asset>> map,
@@ -222,7 +224,7 @@ class _AssetsPageState extends State<AssetsPage> {
         .toList();
 
     for (Asset child in map[parent]!) {
-      getChildren(child, allAssets, map);
+      _getChildren(child, allAssets, map);
     }
 
     return map;
@@ -232,12 +234,9 @@ class _AssetsPageState extends State<AssetsPage> {
     List<Asset> filteredAssets = [];
 
     for (Asset asset in assets) {
-      final matchesSearchText = searchText.isEmpty ||
-          asset.name.toLowerCase().contains(searchText.toLowerCase());
-      final matchesEnergyFilter =
-          !filterEnergy || asset.sensorType == SensorType.energy;
-      final matchesCriticalFilter =
-          !filterCritical || asset.status == SensorStatus.critical;
+      final matchesSearchText = searchText.isEmpty || asset.name.toLowerCase().contains(searchText.toLowerCase());
+      final matchesEnergyFilter = !filterEnergy || asset.sensorType == SensorType.energy;
+      final matchesCriticalFilter = !filterCritical || asset.status == SensorStatus.critical;
 
       if (matchesSearchText && matchesEnergyFilter && matchesCriticalFilter) {
         filteredAssets.add(asset);
