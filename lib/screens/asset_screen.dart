@@ -1,8 +1,10 @@
 import 'dart:async';
-
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../models/asset.dart';
 import '../models/company.dart';
+import '../models/sensor_status.dart';
+import '../models/sensor_type.dart';
 import '../services/api_service.dart';
 import '../theme/colors.dart';
 import '../widgets/asset_expandable_item.dart';
@@ -32,14 +34,10 @@ class _AssetsPageState extends State<AssetsPage> {
   Map<Asset?, List<Asset>> _map = {};
   List<Widget> _widgets = [];
 
-  // TODO maybe use a FutureBuilder instead of this
   @override
   void initState() {
     super.initState();
-    var future = getMapFromApi();
-    future.then(
-      (value) => setState(() => _map = value),
-    );
+    getMapFromApi();
   }
 
   @override
@@ -73,50 +71,41 @@ class _AssetsPageState extends State<AssetsPage> {
           child: Column(
             children: [
               searchBar(),
-              (_isLoading || _map.values.isNotEmpty) && searchText.isEmpty
-                  ? filterBar()
-                  : Container(),
+              _isLoading ? Container() : filterBar(),
             ],
           ),
         ),
         Divider(
           color: Colors.black.withOpacity(0.1),
         ),
-        assetsList(),
+        _isLoading ? const LoadingIndicator() : assetsList(),
       ],
     );
   }
 
-  Future<Map<Asset?, List<Asset>>> getMapFromApi() async {
+  Future<void> getMapFromApi() async {
     setLoading(true);
+    log("getMapFromApi: starting");
     List<Asset> assets = await apiService.getAssets(widget.company.id);
-    // TODO the UI freezes at this point with a large number of assets
-    var map = getChildren(null, assets, {});
-    var widgets = getWidgets(null, map);
+    log("getMapFromApi: ended");
     setState(() {
-      _widgets = widgets;
-    });
-    setLoading(false);
-    return map;
-  }
-
-  setFilters({bool filterEnergy = false, bool filterCritical = false}) {
-    setState(() {
-      filterEnergy = filterEnergy;
-      filterCritical = filterCritical;
+      log("getChildren: starting");
+      _map = getChildren(null, assets, {});
+      log("getChildren: ended");
+      log("getWidgets: starting");
+      _widgets = getWidgets(null, _map);
+      log("getWidgets: ended");
+      setLoading(false);
     });
   }
 
-  setLoading(bool value) {
+  void setLoading(bool value) {
     setState(() {
       _isLoading = value;
     });
   }
 
   Widget assetsList() {
-    if (_isLoading) {
-      return const LoadingIndicator();
-    }
     if (_map.values.isNotEmpty) {
       return Expanded(
         child: ListView(
@@ -129,8 +118,9 @@ class _AssetsPageState extends State<AssetsPage> {
 
   List<Widget> getWidgets(Asset? parent, Map<Asset?, List<Asset>> map) {
     List<Widget> widgets = [];
-    for (Asset child in map[parent]!) {
-      // child has children
+    List<Asset> filteredAssets = filterAssets(map[parent]!);
+
+    for (Asset child in filteredAssets) {
       if (map[child]!.isNotEmpty) {
         var grandchildren = getWidgets(child, map);
         widgets.add(AssetExpandableItem(
@@ -159,6 +149,7 @@ class _AssetsPageState extends State<AssetsPage> {
           onPressed: (pressed) {
             setState(() {
               filterEnergy = pressed;
+              _widgets = getWidgets(null, _map);
             });
           }),
       const SizedBox(width: 8),
@@ -168,6 +159,7 @@ class _AssetsPageState extends State<AssetsPage> {
         onPressed: (pressed) {
           setState(() {
             filterCritical = pressed;
+            _widgets = getWidgets(null, _map);
           });
         },
       ),
@@ -199,9 +191,8 @@ class _AssetsPageState extends State<AssetsPage> {
             style: const TextStyle(color: TractianColors.darkGray),
             onChanged: (value) {
               setState(() {
-                filterEnergy = false;
-                filterCritical = false;
                 searchText = value;
+                _widgets = getWidgets(null, _map);
               });
             },
             controller: fieldText,
@@ -215,6 +206,7 @@ class _AssetsPageState extends State<AssetsPage> {
     fieldText.clear();
     setState(() {
       searchText = "";
+      _widgets = getWidgets(null, _map);
     });
   }
 
@@ -227,15 +219,45 @@ class _AssetsPageState extends State<AssetsPage> {
         .where((child) => parent != null
             ? child.parentId == parent.id || child.locationId == parent.id
             : child.parentId == null && child.locationId == null)
-        .toList();      
+        .toList();
 
-    var children = map[parent]!;
-
-    for (Asset child in children) {
-      var map2 = getChildren(child, allAssets, map);
-      var grandchildren = map2[child];
-      map[child] = grandchildren ?? [];
+    for (Asset child in map[parent]!) {
+      getChildren(child, allAssets, map);
     }
+
     return map;
+  }
+
+  List<Asset> filterAssets(List<Asset> assets) {
+    List<Asset> filteredAssets = [];
+
+    for (Asset asset in assets) {
+      final matchesSearchText = searchText.isEmpty ||
+          asset.name.toLowerCase().contains(searchText.toLowerCase());
+      final matchesEnergyFilter =
+          !filterEnergy || asset.sensorType == SensorType.energy;
+      final matchesCriticalFilter =
+          !filterCritical || asset.status == SensorStatus.critical;
+
+      if (matchesSearchText && matchesEnergyFilter && matchesCriticalFilter) {
+        filteredAssets.add(asset);
+      } else if (hasFilteredDescendant(asset)) {
+        filteredAssets.add(asset);
+      }
+    }
+
+    return filteredAssets;
+  }
+
+  bool hasFilteredDescendant(Asset asset) {
+    if (_map[asset] == null) return false;
+
+    for (Asset child in _map[asset]!) {
+      if (filterAssets([child]).isNotEmpty || hasFilteredDescendant(child)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
